@@ -34,20 +34,43 @@
     min-height: 100vh;
   }
 
-  /* ambient vignette, echoing the render lighting in the deck */
+  /* ambient vignette, echoing the render lighting in the deck — now follows the cursor */
   .vignette {
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(ellipse 900px 600px at 78% 15%, rgba(255,47,126,0.08), transparent 60%),
-      radial-gradient(ellipse 800px 800px at 15% 85%, rgba(255,255,255,0.04), transparent 60%);
+      radial-gradient(ellipse 900px 600px at var(--mx, 78%) var(--my, 15%), rgba(255,47,126,0.12), transparent 60%),
+      radial-gradient(ellipse 800px 800px at var(--mx2, 15%) var(--my2, 85%), rgba(255,255,255,0.045), transparent 60%);
     pointer-events: none;
     z-index: 0;
   }
 
+  /* subtle animated film grain, echoing the vintage/desert renders in the deck */
+  .grain {
+    position: fixed;
+    inset: -20px;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 0.5s steps(4) infinite;
+  }
+
+  @keyframes grainShift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 2%); }
+    50%  { transform: translate(2%, -1%); }
+    75%  { transform: translate(-1%, -2%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain { animation: none !important; }
+  }
+
   .eyebrow {
     position: relative;
-    z-index: 1;
+    z-index: 3;
     padding: 28px 32px 0;
     font-size: 0.72rem;
     letter-spacing: 2.5px;
@@ -59,7 +82,7 @@
 
   main {
     position: relative;
-    z-index: 1;
+    z-index: 3;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -155,7 +178,7 @@
 
   footer {
     position: relative;
-    z-index: 1;
+    z-index: 3;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -209,6 +232,7 @@
 <body>
 
   <div class="vignette"></div>
+  <div class="grain"></div>
 
   <div class="eyebrow">Automotive Designer</div>
 
@@ -241,5 +265,38 @@
     </div>
   </footer>
 
+  <script>
+    (function () {
+      var vignette = document.querySelector('.vignette');
+      if (!vignette || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var hasPointer = window.matchMedia('(pointer: fine)').matches;
+      if (!hasPointer) return; // skip on touch devices, no cursor to follow
+
+      // targets = raw mouse position, cur = smoothed/eased position actually rendered
+      var targetX = 78, targetY = 15;
+      var curX = 78, curY = 15;
+
+      window.addEventListener('mousemove', function (e) {
+        targetX = (e.clientX / window.innerWidth) * 100;
+        targetY = (e.clientY / window.innerHeight) * 100;
+      });
+
+      function tick() {
+        // ease toward the cursor — lower factor = softer, more trailing motion
+        curX += (targetX - curX) * 0.055;
+        curY += (targetY - curY) * 0.055;
+
+        vignette.style.setProperty('--mx', curX + '%');
+        vignette.style.setProperty('--my', curY + '%');
+        // secondary white glow drifts opposite the cursor, for a subtle parallax feel
+        vignette.style.setProperty('--mx2', (100 - curX) + '%');
+        vignette.style.setProperty('--my2', (100 - curY) + '%');
+
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })();
+  </script>
 </body>
 </html>
