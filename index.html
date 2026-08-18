@@ -102,6 +102,9 @@
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     position: relative;
   }
 
@@ -247,7 +250,7 @@
   <div class="eyebrow">Automotive Designer</div>
 
   <main>
-    <img src="Portfoliologo.png" alt="Portfolio" class="title-img">
+    <img src="Portfoliologo.png" alt="Portfolio" class="title-img" draggable="false">
     <p class="byline">of <strong>Giuseppe Cascone</strong> — Exterior Design &amp; AI Integration Specialist</p>
 
     <div class="cta-row">
@@ -312,6 +315,10 @@
     (function () {
       var logo = document.querySelector('.title-img');
       if (!logo) return;
+
+      // hard-block the browser's native "drag this image" behavior,
+      // which otherwise steals the pointer events in some Chromium/Edge builds
+      logo.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
       var offsetX = 0, offsetY = 0;       // current accumulated position
       var startX = 0, startY = 0;         // pointer position when drag started
