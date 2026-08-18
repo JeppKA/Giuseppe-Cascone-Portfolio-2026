@@ -155,6 +155,39 @@
     transform: rotate(4deg) scale(1.06);
   }
 
+  .sig-link {
+    display: inline-block;
+    line-height: 0;
+    margin-top: 2px;
+  }
+
+  .sig-img {
+    width: 108px;
+    height: auto;
+    display: block;
+    opacity: 0.92;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
+    transform: rotate(-3deg);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+  }
+
+  .sig-link:hover .sig-img {
+    transform: rotate(2deg) scale(1.08);
+    opacity: 1;
+  }
+
+  .sig-link:active .sig-img,
+  .sig-img.stamp {
+    animation: stampHit 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes stampHit {
+    0%   { transform: rotate(-3deg) scale(1); }
+    35%  { transform: rotate(-8deg) scale(0.82); }
+    65%  { transform: rotate(4deg) scale(1.12); }
+    100% { transform: rotate(-3deg) scale(1); }
+  }
+
   .btn-view {
     position: relative;
     display: inline-flex;
@@ -261,6 +294,10 @@
         </a>
         <img src="Maialino.png" alt="" class="piggy-cta">
       </div>
+
+      <a href="https://instagram.com/jep_casco" target="_blank" rel="noopener" class="sig-link" aria-label="Visita il profilo Instagram di Giuseppe Cascone">
+        <img src="Jeka.png" alt="firma Jeka" class="sig-img">
+      </a>
     </div>
   </main>
 
@@ -316,8 +353,7 @@
       var logo = document.querySelector('.title-img');
       if (!logo) return;
 
-      // hard-block the browser's native "drag this image" behavior,
-      // which otherwise steals the pointer events in some Chromium/Edge builds
+      // hard-block the browser's native "drag this image" behavior
       logo.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
       var offsetX = 0, offsetY = 0;       // current accumulated position
@@ -325,30 +361,59 @@
       var startOffsetX = 0, startOffsetY = 0;
       var dragging = false;
 
-      logo.addEventListener('pointerdown', function (e) {
+      function getPoint(e) {
+        if (e.touches && e.touches.length) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+      }
+
+      function startDrag(e) {
         dragging = true;
         logo.classList.add('dragging');
-        startX = e.clientX;
-        startY = e.clientY;
+        var p = getPoint(e);
+        startX = p.x;
+        startY = p.y;
         startOffsetX = offsetX;
         startOffsetY = offsetY;
-        logo.setPointerCapture(e.pointerId);
-      });
+        e.preventDefault();
+      }
 
-      logo.addEventListener('pointermove', function (e) {
+      function moveDrag(e) {
         if (!dragging) return;
-        offsetX = startOffsetX + (e.clientX - startX);
-        offsetY = startOffsetY + (e.clientY - startY);
+        var p = getPoint(e);
+        offsetX = startOffsetX + (p.x - startX);
+        offsetY = startOffsetY + (p.y - startY);
         logo.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px)';
-      });
+        e.preventDefault();
+      }
 
       function endDrag() {
         dragging = false;
         logo.classList.remove('dragging');
       }
 
-      logo.addEventListener('pointerup', endDrag);
-      logo.addEventListener('pointercancel', endDrag);
+      // mouse
+      logo.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', moveDrag);
+      document.addEventListener('mouseup', endDrag);
+
+      // touch
+      logo.addEventListener('touchstart', startDrag, { passive: false });
+      document.addEventListener('touchmove', moveDrag, { passive: false });
+      document.addEventListener('touchend', endDrag);
+      document.addEventListener('touchcancel', endDrag);
+    })();
+
+    // signature "stamp" animation on click/tap
+    (function () {
+      var sig = document.querySelector('.sig-img');
+      if (!sig) return;
+      sig.parentElement.addEventListener('click', function () {
+        sig.classList.remove('stamp');
+        void sig.offsetWidth; // restart animation
+        sig.classList.add('stamp');
+      });
     })();
   </script>
 </body>
