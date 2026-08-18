@@ -98,6 +98,9 @@
     display: block;
     opacity: 0;
     animation: fadeUp 0.8s ease 0.25s forwards;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+    cursor: default;
   }
 
   .byline {
@@ -296,6 +299,33 @@
         requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
+    })();
+  </script>
+  <script>
+    (function () {
+      var logo = document.querySelector('.title-img');
+      if (!logo || !window.matchMedia('(pointer: fine)').matches) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var maxShift = 14;   // px, max horizontal/vertical travel
+      var maxTilt  = 6;    // deg, max rotation
+
+      logo.addEventListener('mousemove', function (e) {
+        var rect = logo.getBoundingClientRect();
+        var relX = (e.clientX - rect.left) / rect.width - 0.5;  // -0.5 .. 0.5
+        var relY = (e.clientY - rect.top) / rect.height - 0.5;
+
+        var tx = relX * maxShift * 2;
+        var ty = relY * maxShift * 2;
+        var rot = relX * maxTilt;
+
+        logo.style.transform =
+          'translate(' + tx.toFixed(1) + 'px, ' + ty.toFixed(1) + 'px) rotate(' + rot.toFixed(1) + 'deg)';
+      });
+
+      logo.addEventListener('mouseleave', function () {
+        logo.style.transform = 'translate(0, 0) rotate(0deg)';
+      });
     })();
   </script>
 </body>
