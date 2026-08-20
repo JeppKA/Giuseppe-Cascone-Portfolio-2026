@@ -125,6 +125,50 @@
   .byline strong {
     color: var(--paper);
     font-weight: 600;
+    transition: color 0.35s ease;
+  }
+
+  .byline:hover strong {
+    color: var(--pink);
+  }
+
+  .ticker {
+    margin-top: 26px;
+    width: min(480px, 82vw);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.55s forwards;
+  }
+
+  .ticker-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    gap: 0;
+    animation: tickerScroll 14s linear infinite;
+  }
+
+  .ticker-track img {
+    width: 22px;
+    height: auto;
+    margin: 0 20px;
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
+
+  .ticker-track img:nth-child(3n)   { transform: rotate(-8deg); }
+  .ticker-track img:nth-child(3n+1) { transform: rotate(5deg); }
+  .ticker-track img:nth-child(3n+2) { transform: rotate(-3deg); width: 17px; opacity: 0.65; }
+
+  @keyframes tickerScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track { animation: none; }
   }
 
   .cta-row {
@@ -132,7 +176,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 72px;
     opacity: 0;
     animation: fadeUp 0.7s ease 0.6s forwards;
   }
@@ -203,6 +247,23 @@
     text-decoration: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 0 0 rgba(255,47,126,0);
+    overflow: hidden;
+  }
+
+  .btn-view::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(115deg, transparent, rgba(255,47,126,0.35), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.65s ease;
+  }
+
+  .btn-view:hover::before {
+    left: 130%;
   }
 
   .btn-view:hover {
@@ -210,7 +271,7 @@
     box-shadow: 0 10px 30px rgba(255,47,126,0.25);
   }
 
-  .btn-view svg { width: 16px; height: 16px; transition: transform 0.2s ease; }
+  .btn-view svg { width: 16px; height: 16px; transition: transform 0.2s ease; position: relative; }
   .btn-view:hover svg { transform: translateX(3px); }
 
   /* pink signature squiggle, echo of the hand signature on every deck page */
@@ -285,6 +346,23 @@
   <main>
     <img src="Portfoliologo.png" alt="Portfolio" class="title-img" draggable="false">
     <p class="byline">of <strong>Giuseppe Cascone</strong> — Exterior Design &amp; AI Integration Specialist</p>
+
+    <div class="ticker">
+      <div class="ticker-track">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+        <img src="Cuoricino.png" alt="">
+      </div>
+    </div>
 
     <div class="cta-row">
       <div class="btn-group">
